@@ -1,0 +1,119 @@
+:root {
+    --primary-color: #000000;
+    --secondary-color: #2e3ecc;
+    --font-family: 'Arial, sans-serif';
+    --font-size: 16px;
+    --line-height: 1.5;
+    --padding-horizontal: 20px;
+}
+
+@view-transition {
+  navigation: auto;   /* или "auto" — включает переходы для same-origin навигаций */
+}
+
+/* Опционально: отключить анимацию для пользователей с prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Опционально: сделать cross-fade подлиннее и красивее */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-in-out;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: math;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    min-height: 100vh;
+    font-size: 16px;
+    > * {
+        display: flex;
+        justify-content: center;
+        > * {
+            width: calc(100% - var(--padding-horizontal, 20px) * 2);
+            max-width: 750px;
+        }
+    }
+}
+
+.header {
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    
+    nav ul {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+    }
+
+    a {
+        text-decoration: none;
+        color: var(--primary-color);
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.main {
+    flex: 1;
+    padding: 20px 0;
+}
+
+.footer {
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+}
+
+.container {
+    h3 {
+        margin-top: 1rem;
+        line-height: 2rem;
+    }
+    
+    p {
+        margin-top: 1rem;
+        line-height: var(--line-height, 1.5);
+    }
+    
+    code {
+        font-size: 1rem;
+    }
+    
+    pre[data-lang] {
+        font-size: 1rem;
+        position: relative;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+    }
+}
+
+.dotted-notebook {
+background-color: #ffffff;
+      background-image: 
+        radial-gradient(circle, #8181812d 1px, transparent 1px);
+      background-size: 1rem 1rem; /* расстояние между точками */
+      background-position: 0 0;
+}

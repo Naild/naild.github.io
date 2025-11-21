@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8">
+  <title>Naild</title>
+  <link rel="stylesheet" href="/style.css">
+  <meta name="viewport" content="width=device-width,  initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+
+<body class="body">
+  <header class="header">
+    <nav class="wrapper">
+      <ul>
+        <li><a href="/">Главная</a></li>
+        <li><a href="/blog">Блог</a></li>
+        <li><a href="/contact">Контакты</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main class="main">
+    <section class="section">
+      <div class="container">
+        
+<h1 class="title">
+  Перебазировать ветку в Git
+</h1>
+<p class="subtitle"><strong>2019-11-28</strong></p>
+<p>При работе с Git хорошим всегда приятно видеть линейную историю коммитов, но это не всегда так.
+Чтобы безопасно перебазировать (rebase) свою feature-ветку на актуальную родительскую (например, <code>main</code> или <code>develop</code>), проделаем несколько шагов. Это минимизирует риски потери работы и конфликтов.</p>
+<h3 id="shag-1-sokhraniaem-tekushchee-sostoianie-na-vsiakii-sluchai">Шаг 1: Сохраняем текущее состояние (на всякий случай)</h3>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">$</span><span> git fetch origin
+</span><span style="color:#bf616a;">$</span><span> git checkout наша-feature-ветка
+</span><span style="color:#bf616a;">$</span><span> git branch backup/наша-feature-ветка  </span><span style="color:#65737e;"># резервная копия
+</span></code></pre>
+<p>Это создаст бэкап, с которого всегда можно восстановиться.</p>
+<h3 id="shag-2-obnovim-roditel-skuiu-vetku-lokal-no">Шаг 2: Обновим родительскую ветку локально</h3>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">git</span><span> checkout main        </span><span style="color:#65737e;"># или develop
+</span><span style="color:#bf616a;">git</span><span> pull origin main      </span><span style="color:#65737e;"># обновим до последнего коммита
+</span></code></pre>
+<h3 id="shag-3-pereidem-v-svoiu-vetku-i-sdelai-rebase">Шаг 3: Перейдем в свою ветку и сделай rebase</h3>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">git</span><span> checkout наша-feature-ветка
+</span><span style="color:#bf616a;">git</span><span> rebase main
+</span></code></pre>
+<h3 id="shag-4-reshaem-konflikty-esli-est">Шаг 4: Решаем конфликты (если есть)</h3>
+<p>Если возникнут конфликты — Git остановится на проблемном коммите:</p>
+<ol>
+<li>aksjdf</li>
+<li>Откроем файлы с конфликтами (они помечены <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>)</li>
+<li>Исправь вручную</li>
+<li>После исправления:<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">git</span><span> add .
+</span><span style="color:#bf616a;">git</span><span> rebase</span><span style="color:#bf616a;"> --continue
+</span></code></pre>
+</li>
+</ol>
+<blockquote>
+<p>Если запутались — можно отменить весь rebase:</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">git</span><span> rebase</span><span style="color:#bf616a;"> --abort
+</span></code></pre>
+</blockquote>
+<h3 id="shag-5-protestirui">Шаг 5: Протестируй</h3>
+<p>После успешного rebase <strong>обязательно запусти тесты и проверь, что всё работает</strong>.</p>
+<h3 id="shag-6-zapushem-s-perezapis-iu-istorii">Шаг 6: Запушем с перезаписью истории</h3>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">git</span><span> push</span><span style="color:#bf616a;"> --force-with-lease</span><span> origin твоя-feature-ветка
+</span></code></pre>
+<blockquote>
+<p><code>--force-with-lease</code> — безопаснее, чем <code>--force</code>.<br />
+Он не перезапишет, если кто-то уже запушил в нашу ветку.</p>
+</blockquote>
+<hr />
+<h3 id="al-ternativa-merge-vmesto-rebase-esli-boish-sia">Альтернатива: Merge вместо Rebase (если боишься)</h3>
+<p>Если не хочешь переписывать историю:</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">git</span><span> checkout твоя-feature-ветка
+</span><span style="color:#bf616a;">git</span><span> merge main
+</span><span style="color:#bf616a;">git</span><span> push origin твоя-feature-ветка
+</span></code></pre>
+<blockquote>
+<p>Плюс: безопасно, без переписывания истории<br />
+Минус: будет merge-коммит, история менее "чистая"</p>
+</blockquote>
+<hr />
+<h3 id="poleznye-sovety">Полезные советы</h3>
+<table><thead><tr><th>Ситуация</th><th>Что делать</th></tr></thead><tbody>
+<tr><td>Работаешь один в ветке</td><td>Rebase — ок</td></tr>
+<tr><td>Ветка уже в PR и другие смотрят</td><td>Лучше <strong>merge</strong>, а не rebase</td></tr>
+<tr><td>Хочешь чистую историю</td><td>Rebase, но только до первого пуша в общий репозиторий</td></tr>
+</tbody></table>
+<hr />
+<h3 id="komanda-vsio-v-odnom-ostorozhno">Команда "всё в одном" (осторожно!)</h3>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">git</span><span> checkout твоя-feature-ветка
+</span><span style="color:#bf616a;">git</span><span> fetch origin
+</span><span style="color:#bf616a;">git</span><span> rebase origin/main
+</span><span style="color:#65737e;"># решаешь конфликты
+</span><span style="color:#bf616a;">git</span><span> push</span><span style="color:#bf616a;"> --force-with-lease
+</span></code></pre>
+
+
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Naild. Powered by Zola</p>
+    </div>
+  </footer>
+</body>
+</html>
